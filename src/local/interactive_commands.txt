@@ -79,6 +79,50 @@ qiime srs SRS \
   --o-normalized-table results/collapstab-onlysamples-finalFiltered-srs.qza \
   --verbose
 
+# Alpha diversity
+## generate alpha diversity vector - without normalization:
+qiime diversity alpha \
+    --i-table results/collapstab-onlysamples-finalFiltered.qza \
+    --p-metric 'shannon' \
+    --o-alpha-diversity results/diversity/alpha/shannon-noNorm.qza
+
+## generate alpha diversity vector - on SRS-normalized data:
+qiime diversity alpha \
+    --i-table results/collapstab-onlysamples-finalFiltered-srs.qza \
+    --p-metric 'shannon' \
+    --o-alpha-diversity results/diversity/alpha/shannon-srsNorm.qza
+
+## Correlation with sequencing depth
+## Spearman alpha-correlation without normalization:
+qiime diversity alpha-correlation \
+    --i-alpha-diversity results/diversity/alpha/shannon-noNorm.qza \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --p-method 'spearman' \
+    --o-visualization results/diversity/alpha/shannon-noNorm-correlation-spearman.qzv
+
+## Spearman alpha-correlation on normalized data:
+qiime diversity alpha-correlation \
+    --i-alpha-diversity results/diversity/alpha/shannon-srsNorm.qza \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --p-method 'spearman' \
+    --o-visualization results/diversity/alpha/shannon-srsNorm-correlation-spearman.qzv
+
+## Pearson alpha-correlation without normalization:
+qiime diversity alpha-correlation \
+    --i-alpha-diversity results/diversity/alpha/shannon-noNorm.qza \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --p-method 'pearson' \
+    --o-visualization results/diversity/alpha/shannon-noNorm-correlation-pearson.qzv
+
+## Pearson alpha-correlation on normalized data:
+qiime diversity alpha-correlation \
+    --i-alpha-diversity results/diversity/alpha/shannon-srsNorm.qza \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --p-method 'pearson' \
+    --o-visualization results/diversity/alpha/shannon-srsNorm-correlation-pearson.qzv
+
+## no significant correlation was found between Shannon alpha diversity and sequencing coverage or treatment dose with either Pearson or Spearman method. Then try with observed feature count instead of Shanno diversity:
+
 
 qiime feature-table relative-frequency \
     --i-table results/features-collapsed.qza \
