@@ -1,0 +1,87 @@
+# all commands are executed from project root directory /media/juris/5e715177-0993-440c-996e-24251812b25a/juris/seq/repos/chicken_feed_study
+
+# load QIIME2 environment:
+conda activate qiime2-2020.11
+# add QIIME2 SRS plugin for normalization:
+conda install -c vitorheidrich q2_srs
+
+# filter feature tables to contain only necessary samples:
+qiime feature-table filter-samples \
+    --i-table results/table.qza \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --o-filtered-table results/dadatab-onlysamples.qza
+qiime feature-table filter-samples \
+    --i-table results/features-collapsed.qza \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --o-filtered-table results/collapstab-onlysamples.qza
+
+# plot alpha diversity rarefaction curves on denoised feature tables:
+qiime diversity alpha-rarefaction \
+    --i-table results/dadatab-onlysamples.qza \
+    --p-max-depth 156055 \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --p-steps 16 \
+    --o-visualization results/alpha-rarefaction-dadatab.qzv
+
+# plot alpha diversity rarefaction curves on collapsed genus-level feature tables:
+qiime diversity alpha-rarefaction \
+    --i-table results/collapstab-onlysamples.qza \
+    --p-max-depth 156055 \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --p-steps 16 \
+    --o-visualization results/alpha-rarefaction-collapstab.qzv
+
+# remove chloroplast, mitochondria, eukaryotic and unassigned features and features with no classification below phylum level from collapsed table
+## filter denoised feature table by taxonomic classification:
+qiime taxa filter-table \
+--i-table results/dadatab-onlysamples.qza \
+--i-taxonomy results/taxonomy.qza \
+--p-exclude mitochondria,chloroplast,Eukaryota \
+--p-include p__ \
+--o-filtered-table results/dadatab-onlysamples-filtered.qza
+
+## collapse the filtered table to genus level:
+qiime taxa collapse \
+    --i-table results/dadatab-onlysamples-filtered.qza \
+    --i-taxonomy results/taxonomy.qza \
+    --p-level 6 \
+    --o-collapsed-table results/collapstab-onlysamples-filtered.qza
+
+## export feature table as a TSV file:
+qiime tools export \
+    --input-path results/collapstab-onlysamples-filtered.qza \
+    --output-path results
+biom convert \
+    -i results/feature-table.biom \
+    -o results/collapstab-onlysamples-filtered.tsv \
+    --to-tsv \
+    --table-type "OTU table"
+rm results/feature-table.biom
+
+# manual examination of the latest feature table suggests that features with total frequency below 20 should be dropped. Filter features by minimum frequency:
+qiime feature-table filter-features \
+    --i-table results/collapstab-onlysamples-filtered.qza \
+    --p-min-frequency 20 \
+    --o-filtered-table results/collapstab-onlysamples-finalFiltered.qza
+
+# replot alpha rarefaction curves to see what has changed after filtering:
+qiime diversity alpha-rarefaction \
+    --i-table results/collapstab-onlysamples-finalFiltered.qza \
+    --p-max-depth 156035 \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --p-steps 16 \
+    --o-visualization results/alpha-rarefaction-finaltab.qzv
+
+# looks like there might be some sequencing depth bias although observed feature count does not increase noticeably after 100K sequences. So I will use SRS normalization at 110K in order to balance information loss and relative frequency skewing:
+qiime srs SRS \
+  --i-table results/collapstab-onlysamples-finalFiltered.qza \
+  --p-c-min 110000 \
+  --o-normalized-table results/collapstab-onlysamples-finalFiltered-srs.qza \
+  --verbose
+
+
+qiime feature-table relative-frequency \
+    --i-table results/features-collapsed.qza \
+    --o-relative-frequency-table results/features-collapsed-relfreq.qza
+
+

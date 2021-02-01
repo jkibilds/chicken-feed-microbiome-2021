@@ -1,2 +1,5 @@
 # The results files that were generated:
 results/
+
+# HTML files of R notebooks:
+src/R_notebooks/*.html

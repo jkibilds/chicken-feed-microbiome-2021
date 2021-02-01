@@ -63,7 +63,7 @@ qiime feature-table relative-frequency \
 
 qiime tools export \
     --input-path $OUTDIR_SC/features-collapsed-relfreq.qza \
-    --output-path $OUTDIR_SC \
+    --output-path $OUTDIR_SC
 
 biom convert \
     -i $OUTDIR_SC/feature-table.biom \

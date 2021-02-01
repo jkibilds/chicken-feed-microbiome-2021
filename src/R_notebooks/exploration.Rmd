@@ -1,0 +1,30 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+## Load packages and set the workspace
+
+```{r}
+library(pacman)
+pacman::p_load(tidyverse,
+               here)
+here()
+```
+
+## Import and explore the data
+
+```{r}
+data <- read_tsv(here("data/metadata_samples_Q2.tsv"))
+summary(data)
+glimpse(data)
+```
+
+```{r}
+data %>% 
+  ggplot(aes(x = experiment_group,
+             y = denoised_read_count)) +
+  geom_boxplot() +
+  aes(fill = experiment_group)
+```
+
