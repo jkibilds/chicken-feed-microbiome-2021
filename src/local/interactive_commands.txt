@@ -80,13 +80,13 @@ qiime srs SRS \
   --verbose
 
 # Alpha diversity
-## generate alpha diversity vector - without normalization:
+## generate Shannon alpha diversity vector - without normalization:
 qiime diversity alpha \
     --i-table results/collapstab-onlysamples-finalFiltered.qza \
     --p-metric 'shannon' \
     --o-alpha-diversity results/diversity/alpha/shannon-noNorm.qza
 
-## generate alpha diversity vector - on SRS-normalized data:
+## generate Shannon alpha diversity vector - on SRS-normalized data:
 qiime diversity alpha \
     --i-table results/collapstab-onlysamples-finalFiltered-srs.qza \
     --p-metric 'shannon' \
@@ -121,11 +121,127 @@ qiime diversity alpha-correlation \
     --p-method 'pearson' \
     --o-visualization results/diversity/alpha/shannon-srsNorm-correlation-pearson.qzv
 
-## no significant correlation was found between Shannon alpha diversity and sequencing coverage or treatment dose with either Pearson or Spearman method. Then try with observed feature count instead of Shanno diversity:
+## no significant correlation was found between Shannon alpha diversity and sequencing coverage or treatment dose with either Pearson or Spearman method. Then try with observed feature count instead of Shannon diversity:
+## generate observed_features alpha diversity vector - without normalization:
+qiime diversity alpha \
+    --i-table results/collapstab-onlysamples-finalFiltered.qza \
+    --p-metric 'observed_features' \
+    --o-alpha-diversity results/diversity/alpha/observed_features-noNorm.qza
 
+## Correlation with sequencing depth
+## Spearman alpha-correlation without normalization:
+qiime diversity alpha-correlation \
+    --i-alpha-diversity results/diversity/alpha/observed_features-noNorm.qza \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --p-method 'spearman' \
+    --o-visualization results/diversity/alpha/observed_features-noNorm-correlation-spearman.qzv
 
-qiime feature-table relative-frequency \
-    --i-table results/features-collapsed.qza \
-    --o-relative-frequency-table results/features-collapsed-relfreq.qza
+## observed_features correlates with sequencing depth (p-val 0.01)
 
+## Alpha group significance:
+qiime diversity alpha-group-significance \
+    --i-alpha-diversity results/diversity/alpha/shannon-noNorm.qza \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --o-visualization results/diversity/alpha/shannon-noNorm-alpha-group-significance.qzv
 
+qiime diversity alpha-group-significance \
+    --i-alpha-diversity results/diversity/alpha/shannon-srsNorm.qza \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --o-visualization results/diversity/alpha/shannon-srsNorm-alpha-group-significance.qzv
+## Treated sample group has lower Shannon entropy (more uneven distribution of abundances) than control. Not significant, but it could be simply due to small sample size.
+
+qiime diversity alpha-group-significance \
+    --i-alpha-diversity results/diversity/alpha/observed_features-noNorm.qza \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --o-visualization results/diversity/alpha/observed_features-noNorm-alpha-group-significance.qzv
+## observed_features show significant difference between 30mg and 60mg groups but it is due to read count distribution (boxplots look the same as for sequencing depth visualization)
+
+# Beta diversity
+
+## Bray-Curtis without normalization:
+qiime diversity beta \
+    --i-table results/collapstab-onlysamples-finalFiltered.qza \
+    --p-metric 'braycurtis' \
+    --o-distance-matrix results/diversity/beta/BC-noNorm.qza
+
+## Bray-Curtis on normalized data:
+qiime diversity beta \
+    --i-table results/collapstab-onlysamples-finalFiltered-srs.qza \
+    --p-metric 'braycurtis' \
+    --o-distance-matrix results/diversity/beta/BC-srsNorm.qza
+
+## Aitchison without normalization:
+qiime diversity beta \
+    --i-table results/collapstab-onlysamples-finalFiltered.qza \
+    --p-metric 'aitchison' \
+    --o-distance-matrix results/diversity/beta/aitchison-noNorm.qza
+
+## Aitchison on normalized data:
+qiime diversity beta \
+    --i-table results/collapstab-onlysamples-finalFiltered-srs.qza \
+    --p-metric 'aitchison' \
+    --o-distance-matrix results/diversity/beta/aitchison-srsNorm.qza
+
+qiime diversity beta-correlation \
+    --i-distance-matrix results/diversity/beta/BC-srsNorm.qza \
+    --m-metadata-file data/metadata_samples_Q2.tsv \
+    --m-metadata-column "dose_mg_per_kg" \
+    --p-method 'spearman' \
+    --o-metadata-distance-matrix results/diversity/beta/metadata-distmatrix-01.qza \
+    --o-mantel-scatter-visualization results/diversity/beta/BC-srsNorm-beta-correlation.qzv
+# p-value is 0.002 but I don't understand the graph
+
+qiime diversity beta-group-significance \
+    --i-distance-matrix results/diversity/beta/BC-srsNorm.qza \
+    --m-metadata-file data/metadata_samples_Q2_nospaces.tsv \
+    --m-metadata-column "experiment_group" \
+    --p-method 'permanova' \
+    --p-pairwise \
+    --o-visualization results/diversity/beta/BC-srsNorm-group-significance.qzv
+# p-value=0.047 for difference between control and 60mg group but I don't understand the plots and I think there are some errors with category names in the plots
+
+qiime diversity adonis \
+    --i-distance-matrix results/diversity/beta/BC-srsNorm.qza \
+    --m-metadata-file data/metadata_samples_Q2_nospaces.tsv \
+    --p-formula "experiment_group+treated" \
+    --o-visualization results/diversity/beta/BC-srsNorm-adonis.qzv
+# experient_group p-value=0.015 but treatment effect is not shown - something wrong again?
+
+# Deicode - compositional beta diversity PCA ordination. Chloroplasts and other invalid features have not been removed:
+##assume 2 instead of 3 groups:
+qiime deicode rpca \
+    --i-table results/dadatab-onlysamples.qza \
+    --p-min-feature-count 20 \
+    --p-n-components 2 \
+    --o-biplot results/diversity/beta/deicode-dadatab-ordination.qza \
+    --o-distance-matrix results/diversity/beta/deicode-dadatab-distance.qza
+
+qiime emperor biplot \
+    --i-biplot results/diversity/beta/deicode-dadatab-ordination.qza \
+    --m-sample-metadata-file data/metadata_samples_Q2_nospaces.tsv \
+    --m-feature-metadata-file results/taxonomy.qza \
+    --o-visualization results/diversity/beta/deicode-dadatab-biplot.qzv \
+    --p-number-of-features 8
+## PCA axis loadings change significantly depending on whether --p-n-components is set to 2 or 3
+
+qiime diversity beta-group-significance \
+    --i-distance-matrix results/diversity/beta/deicode-dadatab-distance.qza \
+    --m-metadata-file data/metadata_samples_Q2_nospaces.tsv \
+    --m-metadata-column treated \
+    --p-method permanova \
+    --o-visualization results/diversity/beta/deicode-dadatab_treatment_significance.qzv
+## p-value=0.001 and plots are understandable. Need to repeat DEICODE with 3 assumed ranks. Also with genus collapsed or at least taxonomically filtered table.
+
+## DEICODE mode that automatically selects number of ranks:
+qiime deicode auto-rpca \
+    --i-table results/dadatab-onlysamples.qza \
+    --p-min-feature-count 20 \
+    --o-biplot results/diversity/beta/deicode-auto-dadatab-ordination.qza \
+    --o-distance-matrix results/diversity/beta/deicode-auto-dadatab-distance.qza
+## it selected 2 ranks, 2 axis in the biplot are available
+qiime emperor biplot \
+    --i-biplot results/diversity/beta/deicode-auto-dadatab-ordination.qza \
+    --m-sample-metadata-file data/metadata_samples_Q2_nospaces.tsv \
+    --m-feature-metadata-file results/taxonomy.qza \
+    --o-visualization results/diversity/beta/deicode-auto-dadatab-biplot.qzv \
+    --p-number-of-features 8
