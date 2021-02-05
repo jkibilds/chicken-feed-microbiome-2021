@@ -1,0 +1,7 @@
+# Prepare MaAsLin2 inputs
+
+cd /media/juris/5e715177-0993-440c-996e-24251812b25a/juris/seq/repos/chicken_feed_study
+
+## remove 1st line from results/collapstab-onlysamples-filtered.tsv manually, save as results/collapstab-onlysamples-filtered-for-maaslin.tsv
+
+cat results/collapstab-onlysamples-filtered-for-maaslin.tsv | datamash transpose > results/collapstab-onlysamples-filtered-for-maaslin-transposed.tsv

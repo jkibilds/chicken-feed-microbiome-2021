@@ -28,3 +28,10 @@ data %>%
   aes(fill = experiment_group)
 ```
 
+```{r}
+data %>% 
+  ggplot(aes(x = treated,
+             y = denoised_read_count)) +
+  geom_boxplot() +
+  aes(fill = treated)
+```
