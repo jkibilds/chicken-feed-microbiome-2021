@@ -64,6 +64,19 @@ qiime feature-table filter-features \
     --p-min-frequency 20 \
     --o-filtered-table results/collapstab-onlysamples-finalFiltered.qza
 
+# the same for no-collapsed table (but filtering with --p-min-frequency 20 would not be appropriate because these are not collapsed features, instead just remove singletons):
+qiime feature-table filter-features \
+    --i-table results/dadatab-onlysamples-filtered.qza \
+    --p-min-frequency 2 \
+    --o-filtered-table results/dadatab-onlysamples-finalFiltered.qza
+
+# prepare filtered representative sequences for phylogenetic diversity alignments:
+
+qiime feature-table filter-seqs \
+    --i-data results/representative_sequences.qza \
+    --i-table results/dadatab-onlysamples-finalFiltered.qza \
+    --o-filtered-data results/representative_sequences_finalFiltered.qza # this will be input for sepp.sh script
+
 # replot alpha rarefaction curves to see what has changed after filtering:
 qiime diversity alpha-rarefaction \
     --i-table results/collapstab-onlysamples-finalFiltered.qza \
