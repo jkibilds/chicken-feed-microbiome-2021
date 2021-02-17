@@ -4,15 +4,29 @@ source activate qiime2-2020.11
 
 cd /media/juris/5e715177-0993-440c-996e-24251812b25a/juris/seq/repos/chicken_feed_study
 
-IN_FTAB=results/dadatab-onlysamples-finalFiltered.qza # dadatab minus singletons and nonsense taxons (mito, unassign etc.)
-# IN_FTAB=results/collapstab-onlysamples-finalFiltered.qza # collapsed, minus nonsense taxons and minfreq 20
+IN_FTAB=results/dadatab-onlysamples-pmin20Filtered-srs.qza # dadatab minus singletons and nonsense taxons (mito, unassign etc.), SRS-normalized
+# IN_FTAB=results/collapstab-onlysamples-finalFiltered-srs.qza # collapsed, minus nonsense taxons and minfreq 20, SRS-normalized
 IN_PHYL=results/sepp/phylogeny.qza
 METADATA=data/metadata_samples_Q2.tsv
-OUTDIR=results/alpha-dadatab
+OUTDIR=results/alpha-dadatab-20-srs
 
 mkdir -p $OUTDIR
 
 # non-phylogenetic metrics:
+qiime diversity alpha \
+    --i-table $IN_FTAB \
+    --p-metric 'observed_features' \
+    --o-alpha-diversity $OUTDIR/observed_features-alpha.qza
+qiime diversity alpha-correlation \
+    --i-alpha-diversity $OUTDIR/observed_features-alpha.qza \
+    --m-metadata-file $METADATA \
+    --p-method 'spearman' \
+    --o-visualization $OUTDIR/observed_features-alpha-cor.qzv
+qiime diversity alpha-group-significance \
+    --i-alpha-diversity $OUTDIR/observed_features-alpha.qza \
+    --m-metadata-file $METADATA \
+    --o-visualization $OUTDIR/observed_features-alpha-sig.qzv
+
 qiime diversity alpha \
     --i-table $IN_FTAB \
     --p-metric 'shannon' \
@@ -40,20 +54,6 @@ qiime diversity alpha-group-significance \
     --i-alpha-diversity $OUTDIR/simpson-alpha.qza \
     --m-metadata-file $METADATA \
     --o-visualization $OUTDIR/simpson-alpha-sig.qzv
-
-qiime diversity alpha \
-    --i-table $IN_FTAB \
-    --p-metric 'chao1' \
-    --o-alpha-diversity $OUTDIR/chao1-alpha.qza
-qiime diversity alpha-correlation \
-    --i-alpha-diversity $OUTDIR/chao1-alpha.qza \
-    --m-metadata-file $METADATA \
-    --p-method 'spearman' \
-    --o-visualization $OUTDIR/chao1-alpha-cor.qzv
-qiime diversity alpha-group-significance \
-    --i-alpha-diversity $OUTDIR/chao1-alpha.qza \
-    --m-metadata-file $METADATA \
-    --o-visualization $OUTDIR/chao1-alpha-sig.qzv
 
 qiime diversity alpha \
     --i-table $IN_FTAB \

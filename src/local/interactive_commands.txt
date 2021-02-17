@@ -92,6 +92,24 @@ qiime srs SRS \
   --o-normalized-table results/collapstab-onlysamples-finalFiltered-srs.qza \
   --verbose
 
+# Also perform SRS normalization on DADA2 table (w/o singletons and nosense taxa) because most alpha diversity calculations assume qual sampling depth:
+qiime srs SRS \
+  --i-table results/dadatab-onlysamples-finalFiltered.qza \
+  --p-c-min 114666 \
+  --o-normalized-table results/dadatab-onlysamples-finalFiltered-srs.qza
+
+# Filter DADA2 table to min frequency 20 - it might remove more noise
+qiime feature-table filter-features \
+    --i-table results/dadatab-onlysamples-filtered.qza \
+    --p-min-frequency 20 \
+    --o-filtered-table results/dadatab-onlysamples-pmin20Filtered.qza
+
+# SRS-normalize the min frequency 20 dadatable:
+qiime srs SRS \
+  --i-table results/dadatab-onlysamples-pmin20Filtered.qza \
+  --p-c-min 113998 \
+  --o-normalized-table results/dadatab-onlysamples-pmin20Filtered-srs.qza
+
 # Alpha diversity
 ## generate Shannon alpha diversity vector - without normalization:
 qiime diversity alpha \

@@ -7,3 +7,8 @@ src/R_notebooks/*.html
 # R files that I don't think I need:
 src/R_notebooks/.RData
 src/R_notebooks/.Rhistory
+
+# output and note files that are not suited for line-by-line version control:
+*.ods
+*.qzv
+

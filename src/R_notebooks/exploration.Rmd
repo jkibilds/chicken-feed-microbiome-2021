@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ## Load packages and set the workspace
@@ -35,3 +37,12 @@ data %>%
   geom_boxplot() +
   aes(fill = treated)
 ```
+
+```{r}
+data %>% 
+  ggplot(aes(x = dose_mg_per_kg,
+             y = denoised_read_count)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
