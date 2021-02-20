@@ -1,0 +1,35 @@
+MaAsLin2 setup
+
+Input - --p-min-frequency 2 tabula, SRS normalizēta, pirms taksonomijas apvienošanas. Pēc tam dažus variantus uztaisīt arī bez SRS, bet MaAsLin2 veikt CLR normalizāciju
+MaAsLin2 parametri:
+-t transform: LOG, AST, NONE
+-a MIN_ABUNDANCE 100
+-p MIN_PREVALENCE 0.3 (lai iekļautu gadījumus, kad no kontroles pazūd jau pie mazākās devas)
+-m ANALYSIS_METHOD LM
+-c CORRECTION BH
+random_effects - none
+fixed effects - atsevišķi deva, pēc tam labākajiem variantiem treatment un read count
+
+q-value jāsamazina. No pirmajiem grafikiem var redzēt, ka pie 0.14 līkne jau izskatās nepārliecinoša. 0.12 varētu būt slieksnis, varbūt pēc tam var samazināt vēl. Grafikos arī jāpēta, kā starp grupām ir sadalītas nulles vērtības, lai atmestu mazāk ticamās sakarības.
+
+Ar SRS un AST transformāciju iznāk vien error:
+```
+Error in `$<-.data.frame`(`*tmp*`, "feature", value = "X297ba5ee3e476012008ee9dcc15c2a1a") : replacement has 1 row, data has 0
+``` 
+
+Pēc tam piemeklēt taksonomiju būtiski saistītajiem features (qiime metadata tabulate?). Un pārbaudīt, vai ar apvienotajām taksonomijām var iegūt tādu pašu rezultātu
+Ar labāko normalizācijas un transformācijas variantu beigās uztaisīt MaAsLin2 arī citos taksonomiskajos līmeņos
+
+---
+MaAsLin2 novērojumi:
+SRS, LM bez transformācijas - qmax=0.2 (ap 0.22 ir gan ok, gan pilnīgi čau grafiki)
++++SRS, LM ar LOG transformāciju - qmax=0.11 (zem 0.1 gan arī ir atsevišķi acīmredzami viltus pozitīvie) - jālieto šis variants, samazinot q-value
+bez transformācijas, ZINB - daudz nejēdzīgu viltus pozitīvo, bet parāda, ka ir arī atšķirības starp 30 un 60 mg presence/absence ziņā
+bez transformācijas, NEGBIN - arī daudz viltus pozitīvo, bet ar it kā ļoti zemām q-vērtībam.
+LOG transformācija darbojas tikai ar [...]LM metodēm
+CLR normalizācija ar LOG transformāciju dod kļūdu, rezultāta nav: `replacement has 1 row, data has 0`
+CLR normalizācija bez LOG transformācijas, LM dod daudz rezultātus, qmax varētu būt ap 0.1, bet arī ir daudz aizdomīgu grafiku.
+CLR normalizācija bez LOG transformācijas, NEGBIN vai ZINB regresija - no associations to plot
+
+MaAsLin2 daļai no feature id pievieno sākumā "X", līdz ar to šos feature nevar atrast taksonomijas failā. Ja noņem "X", tad var iegūst reālu un taksonomijas failā atrodamu feature ID. DADA2 un SRS output tabulās šo "X" vēl nav, arī MaAsLin2 input tabulā pēc datamash transpose pārbaudīto feature nosaukumos nav "X", tātad vainīgs MaAsLin2. Pārbaudot visus 50+ features, kas ir būtiski saistīti ar skuju ekstrakta devu šajā analīzē, redzams, ka "X" ir pievienots visiem nosaukumiem, kas sākas ar ciparu. Taksonomijas tabulā pārbaudīju, ka nevienā feature ID nav "X", tātad var vienkārši novākt "X" un lietot tālāk esošās tabulas.
+Vistu analīzei tātad jāņem taksonomiskā tabula ģints līmenī, bet paralēli jāuzraksta Biobakery forumā jautājums.

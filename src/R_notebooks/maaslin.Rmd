@@ -1,6 +1,8 @@
 ---
 title: "R Notebook"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 ## Load packages and set the environment
@@ -14,17 +16,102 @@ library(here)
 here()
 ```
 
-## Fit MaAsLin2 finear multivariate model to not-normalized, filtered, collapsed table
-Taxonomic filter has been applied, not min feature count filter (I would have to export it from QIIME2).
+## Fit MaAsLin2 finear multivariate model to SRS-normalized, feature table
+Taxonomic filter has been applied to remove nonsense taxa. Singletons have been removed and taxonomic information is not present in the input feature table.
 ```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
-collaps1_clr_log <- Maaslin2(here("results/collapstab-onlysamples-filtered-for-maaslin-transposed.tsv"),
+srs_noTax_LogTransform_dose <- Maaslin2(here("results/dadatab-onlysamples-finalFiltered-srs-transp.tsv"),
                      here("data/metadata_samples_Q2_nospaces.tsv"),
-                     here("results/MaAsLin2/collaps1_clr_log"),
-         fixed_effects = c('treated',
-                           'dose_mg_per_kg',
-                           'denoised_read_count'),
-         min_abundance = 0.0,
-         min_prevalence = 0.5,
+                     here("results/MaAsLin2/srs_noTax_LogTransform_dose"),
+         fixed_effects = 'dose_mg_per_kg',
+         min_abundance = 100,
+         min_prevalence = 0.3,
+         normalization = "NONE",
+         transform = "LOG",
+         analysis_method = "LM",
+         max_significance = 0.25,
+         standardize = TRUE)
+```   
+
+```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
+srs_noTax_noTransform_dose <- Maaslin2(here("results/dadatab-onlysamples-finalFiltered-srs-transp.tsv"),
+                     here("data/metadata_samples_Q2_nospaces.tsv"),
+                     here("results/MaAsLin2/srs_noTax_noTransform_dose"),
+         fixed_effects = 'dose_mg_per_kg',
+         min_abundance = 100,
+         min_prevalence = 0.3,
+         normalization = "NONE",
+         transform = "NONE",
+         analysis_method = "LM",
+         max_significance = 0.25,
+         standardize = TRUE)
+```
+
+
+```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
+ZINB_srs_noTax_noTransform_dose <- Maaslin2(here("results/dadatab-onlysamples-finalFiltered-srs-transp.tsv"),
+                     here("data/metadata_samples_Q2_nospaces.tsv"),
+                     here("results/MaAsLin2/ZINB_srs_noTax_noTransform_dose"),
+         fixed_effects = 'dose_mg_per_kg',
+         min_abundance = 100,
+         min_prevalence = 0.3,
+         normalization = "NONE",
+         transform = "NONE",
+         analysis_method = "ZINB",
+         max_significance = 0.25,
+         standardize = TRUE)
+```
+
+```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
+NB_srs_noTax_noTransform_dose <- Maaslin2(here("results/dadatab-onlysamples-finalFiltered-srs-transp.tsv"),
+                     here("data/metadata_samples_Q2_nospaces.tsv"),
+                     here("results/MaAsLin2/NB_srs_noTax_noTransform_dose"),
+         fixed_effects = 'dose_mg_per_kg',
+         min_abundance = 100,
+         min_prevalence = 0.3,
+         normalization = "NONE",
+         transform = "NONE",
+         analysis_method = "NEGBIN",
+         max_significance = 0.25,
+         standardize = TRUE)
+```
+
+```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
+NB_srs_noTax_LogTransform_dose <- Maaslin2(here("results/dadatab-onlysamples-finalFiltered-srs-transp.tsv"),
+                     here("data/metadata_samples_Q2_nospaces.tsv"),
+                     here("results/MaAsLin2/NB_srs_noTax_LogTransform_dose"),
+         fixed_effects = 'dose_mg_per_kg',
+         min_abundance = 100,
+         min_prevalence = 0.3,
+         normalization = "NONE",
+         transform = "LOG",
+         analysis_method = "NEGBIN",
+         max_significance = 0.25,
+         standardize = TRUE)
+```
+
+```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
+ZINB_srs_noTax_LogTransform_dose <- Maaslin2(here("results/dadatab-onlysamples-finalFiltered-srs-transp.tsv"),
+                     here("data/metadata_samples_Q2_nospaces.tsv"),
+                     here("results/MaAsLin2/ZINB_srs_noTax_LogTransform_dose"),
+         fixed_effects = 'dose_mg_per_kg',
+         min_abundance = 100,
+         min_prevalence = 0.3,
+         normalization = "NONE",
+         transform = "LOG",
+         analysis_method = "ZINB",
+         max_significance = 0.25,
+         standardize = TRUE)
+```
+
+## Fit MaAsLin2 finear multivariate model to non-normalized, feature table
+Taxonomic filter has been applied to remove nonsense taxa. Singletons have been removed and taxonomic information is not present in the input feature table.
+```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
+clr_noTax_LogTransform_dose <- Maaslin2(here("results/dadatab-onlysamples-finalFiltered-transp.tsv"),
+                     here("data/metadata_samples_Q2_nospaces.tsv"),
+                     here("results/MaAsLin2/clr_noTax_LogTransform_dose"),
+         fixed_effects = 'dose_mg_per_kg',
+         min_abundance = 100,
+         min_prevalence = 0.3,
          normalization = "CLR",
          transform = "LOG",
          analysis_method = "LM",
@@ -33,93 +120,44 @@ collaps1_clr_log <- Maaslin2(here("results/collapstab-onlysamples-filtered-for-m
 ```   
 
 ```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
-test <- Maaslin2(here("results/collapstab-onlysamples-filtered-for-maaslin-transposed.tsv"),
+clr_noTax_noTransform_dose <- Maaslin2(here("results/dadatab-onlysamples-finalFiltered-transp.tsv"),
                      here("data/metadata_samples_Q2_nospaces.tsv"),
-                     here("results/MaAsLin2/test"),
-         fixed_effects = c('treated',
-                           'dose_mg_per_kg',
-                           'denoised_read_count'),
-         min_abundance = 0.0,
-         min_prevalence = 0.5,
-         normalization = "CLR",
-         transform = "NONE",
-         analysis_method = "LM",
-         max_significance = 0.25,
-         standardize = TRUE)
-```
-
-```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
-test2 <- Maaslin2(here("results/collapstab-onlysamples-filtered-for-maaslin-transposed.tsv"),
-                     here("data/metadata_samples_Q2_nospaces.tsv"),
-                     here("results/MaAsLin2/test2"),
-         fixed_effects = c('treated',
-                           'dose_mg_per_kg',
-                           'denoised_read_count'),
-         min_abundance = 0.0,
-         min_prevalence = 0.5,
-         normalization = "NONE",
-         transform = "LOG",
-         analysis_method = "LM",
-         max_significance = 0.25,
-         standardize = TRUE)
-```
-
-```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
-test3 <- Maaslin2(here("results/collapstab-onlysamples-filtered-for-maaslin-transposed.tsv"),
-                     here("data/metadata_samples_Q2_nospaces.tsv"),
-                     here("results/MaAsLin2/test3"),
+                     here("results/MaAsLin2/clr_noTax_noTransform_dose"),
          fixed_effects = 'dose_mg_per_kg',
-         min_abundance = 0.0,
-         min_prevalence = 0.5,
-         normalization = "NONE",
-         transform = "LOG",
-         analysis_method = "LM",
-         max_significance = 0.25,
-         standardize = TRUE)
-```
-Šeit ir daudz būtisku un skaidru sakarību. Skatoties uz grafikiem, kļūst skaidrs, ka varbūt tomēr vajag SRS normalizāciju pirms tam uztaisīt. Dažām sakarībām LM nav piemērotākā metode (vai arī dose_mg_per_kg nav piemērotākais mainīgais - labāk treated kategorijas). treatad kategorija jāapskata arī ar LEfSe.
-
-```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
-test4 <- Maaslin2(here("results/collapstab-onlysamples-filtered-for-maaslin-transposed.tsv"),
-                     here("data/metadata_samples_Q2_nospaces.tsv"),
-                     here("results/MaAsLin2/test4"),
-         fixed_effects = 'treated',
-         min_abundance = 0.0,
-         min_prevalence = 0.5,
-         normalization = "CLR",
-         transform = "LOG",
-         analysis_method = "LM",
-         max_significance = 0.25,
-         standardize = TRUE)
-```  
-
-```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
-test5 <- Maaslin2(here("results/collapstab-onlysamples-filtered-for-maaslin-transposed.tsv"),
-                     here("data/metadata_samples_Q2_nospaces.tsv"),
-                     here("results/MaAsLin2/test5"),
-         fixed_effects = 'treated',
-         min_abundance = 0.0,
-         min_prevalence = 0.5,
+         min_abundance = 100,
+         min_prevalence = 0.3,
          normalization = "CLR",
          transform = "NONE",
          analysis_method = "LM",
          max_significance = 0.25,
          standardize = TRUE)
 ``` 
-Šeit daudz skaidru (un arī mazāk skaidru) sakarību. Jāpamēģina arī SRS pirms CLR. Iespējams, ka 
 
 ```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
-test6 <- Maaslin2(here("results/collapstab-onlysamples-filtered-for-maaslin-transposed.tsv"),
+NB_clr_noTax_noTransform_dose <- Maaslin2(here("results/dadatab-onlysamples-finalFiltered-transp.tsv"),
                      here("data/metadata_samples_Q2_nospaces.tsv"),
-                     here("results/MaAsLin2/test6"),
+                     here("results/MaAsLin2/NB_clr_noTax_noTransform_dose"),
          fixed_effects = 'dose_mg_per_kg',
-         min_abundance = 0.0,
-         min_prevalence = 0.5,
+         min_abundance = 100,
+         min_prevalence = 0.3,
          normalization = "CLR",
          transform = "NONE",
-         analysis_method = "LM",
+         analysis_method = "NEGBIN",
          max_significance = 0.25,
          standardize = TRUE)
 ```
-Šeit arī šo to atrod. Salīdzinot visus šos testa variantus, izkristalizējas daži taksoni, kuri pavisam droši korelē ar skuju ekstrakta devu vai eksperimenta grupu/kontroli vispār.
-Arī redzams, ka tomēr vajag min abundance slieksni - vai nu šeit vai arī eksportēt no Q2 tabulu, kura ir filtrēta ar --p-min-frequency 20.
+
+```{r, message=FALSE,warning=FALSE,results='hide',fig.keep='all'}
+ZINB_clr_noTax_noTransform_dose <- Maaslin2(here("results/dadatab-onlysamples-finalFiltered-transp.tsv"),
+                     here("data/metadata_samples_Q2_nospaces.tsv"),
+                     here("results/MaAsLin2/ZINB_clr_noTax_noTransform_dose"),
+         fixed_effects = 'dose_mg_per_kg',
+         min_abundance = 100,
+         min_prevalence = 0.3,
+         normalization = "CLR",
+         transform = "NONE",
+         analysis_method = "ZINB",
+         max_significance = 0.25,
+         standardize = TRUE)
+```
+

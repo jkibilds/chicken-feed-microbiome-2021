@@ -1,7 +1,20 @@
-# Prepare MaAsLin2 inputs
-
 cd /media/juris/5e715177-0993-440c-996e-24251812b25a/juris/seq/repos/chicken_feed_study
 
-## remove 1st line from results/collapstab-onlysamples-filtered.tsv manually, save as results/collapstab-onlysamples-filtered-for-maaslin.tsv
+biom convert -i results/feature-table.biom -o results/dadatab-onlysamples-finalFiltered-srs.tsv --to-tsv --table-type "OTU table"
 
-cat results/collapstab-onlysamples-filtered-for-maaslin.tsv | datamash transpose > results/collapstab-onlysamples-filtered-for-maaslin-transposed.tsv
+# manually delete first line from exported feature table because datamash will throw an error on it (unequal field number between lines)
+nano results/dadatab-onlysamples-finalFiltered-srs.tsv
+Ctrl+K
+Ctrl+X, save
+
+# make a transposed feature table for MaAsLin2:
+cat results/dadatab-onlysamples-finalFiltered-srs.tsv | datamash transpose > results/dadatab-onlysamples-finalFiltered-srs-transp.tsv
+
+rm results/feature-table.biom # clean up
+
+###
+
+# How to link significant features (identified by MAAsLin2) with taxonomy:
+qiime metadata tabulate --m-input-file results/taxonomy.qza --o-visualization results/taxonomy.qzv
+# export or save this table as TSV from interactive view: feature-taxonomy-tabulated.tsv
+# then find the taxonomies manually, unless there are so many to require a script
