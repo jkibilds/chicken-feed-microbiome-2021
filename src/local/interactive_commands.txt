@@ -92,7 +92,7 @@ qiime srs SRS \
   --o-normalized-table results/collapstab-onlysamples-finalFiltered-srs.qza \
   --verbose
 
-# Also perform SRS normalization on DADA2 table (w/o singletons and nosense taxa) because most alpha diversity calculations assume qual sampling depth:
+# Also perform SRS normalization on DADA2 table (w/o singletons and nosense taxa) because most alpha diversity calculations assume equal sampling depth:
 qiime srs SRS \
   --i-table results/dadatab-onlysamples-finalFiltered.qza \
   --p-c-min 114666 \
@@ -276,3 +276,10 @@ qiime emperor biplot \
     --m-feature-metadata-file results/taxonomy.qza \
     --o-visualization results/diversity/beta/deicode-auto-dadatab-biplot.qzv \
     --p-number-of-features 8
+
+## collapse the SRS-normalized feature table for MaAsLin2 input:
+qiime taxa collapse \
+    --i-table results/dadatab-onlysamples-finalFiltered-srs.qza \
+    --i-taxonomy results/taxonomy.qza \
+    --p-level 6 \
+    --o-collapsed-table results/dadatab-onlysamples-finalFiltered-srs-collapsed.qza
