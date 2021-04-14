@@ -1,4 +1,5 @@
 MaAsLin2 setup
+using MaAsLin2 package version 1.4.0, R 4.0.3
 
 Input - --p-min-frequency 2 tabula, SRS normalizēta, pirms taksonomijas apvienošanas. Pēc tam dažus variantus uztaisīt arī bez SRS, bet MaAsLin2 veikt CLR normalizāciju
 MaAsLin2 parametri:

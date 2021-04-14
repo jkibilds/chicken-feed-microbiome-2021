@@ -160,3 +160,27 @@ qiime diversity beta-group-significance \
     --m-metadata-column $META_COL_GROUP1\
     --p-method 'permanova' \
     --o-visualization $OUTDIR/wUniFrac-beta-sig.qzv
+
+qiime diversity beta-phylogenetic \
+    --i-table $IN_FTAB \
+    --i-phylogeny $IN_PHYL \
+    --p-metric 'generalized_unifrac' \
+    --o-distance-matrix $OUTDIR/gUniFrac-beta.qza
+qiime diversity beta-correlation \
+    --i-distance-matrix $OUTDIR/gUniFrac-beta.qza \
+    --m-metadata-file $METADATA \
+    --m-metadata-column $META_COL_COR1 \
+    --p-method 'spearman' \
+    --output-dir $OUTDIR/gUniFrac-beta-cor-$META_COL_COR1
+qiime diversity beta-correlation \
+    --i-distance-matrix $OUTDIR/gUniFrac-beta.qza \
+    --m-metadata-file $METADATA \
+    --m-metadata-column $META_COL_COR2 \
+    --p-method 'spearman' \
+    --output-dir $OUTDIR/gUniFrac-beta-cor-$META_COL_COR2
+qiime diversity beta-group-significance \
+    --i-distance-matrix $OUTDIR/gUniFrac-beta.qza \
+    --m-metadata-file $METADATA \
+    --m-metadata-column $META_COL_GROUP1\
+    --p-method 'permanova' \
+    --o-visualization $OUTDIR/gUniFrac-beta-sig.qzv

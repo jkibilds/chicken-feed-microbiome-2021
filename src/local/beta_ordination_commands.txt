@@ -1,0 +1,15 @@
+cd /media/juris/5e715177-0993-440c-996e-24251812b25a/juris/seq/repos/chicken_feed_study/results/diversity/beta
+
+# Bray-Curtis (no singletons and nonsense taxa, SRS-normalized)
+qiime diversity pcoa --i-distance-matrix BC-srsNorm.qza --o-pcoa BC-srsNorm-pcoa.qza
+
+# BC without SRS normalization
+qiime diversity pcoa --i-distance-matrix BC-noNorm.qza --o-pcoa BC-noNorm-pcoa.qza
+
+qiime emperor plot --i-pcoa BC-srsNorm-pcoa.qza --m-metadata-file ../../../data/metadata_samples_Q2_nospaces.tsv --o-visualization BC-srsNorm-pcoa-plot.qzv4
+
+qiime emperor plot --i-pcoa BC-noNorm-pcoa.qza --m-metadata-file ../../../data/metadata_samples_Q2_nospaces.tsv --o-visualization BC-noNorm-pcoa-plot.qzv
+# With and without SRS normalization Emperor plots are very similar.
+
+# what about Aitchison?
+# ordnāciju varbūt vispār nevajag šeit pīt iekšā. Tikai kādu smuku vizualizāciju, lai ir kaut kas rakstā, kam piesiet acis

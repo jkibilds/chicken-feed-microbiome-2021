@@ -4,7 +4,7 @@ source activate qiime2-2020.11
 
 cd /media/juris/5e715177-0993-440c-996e-24251812b25a/juris/seq/repos/chicken_feed_study
 
-IN_FTAB=results/dadatab-onlysamples-pmin20Filtered-srs.qza # dadatab minus singletons and nonsense taxons (mito, unassign etc.), SRS-normalized
+IN_FTAB=results/dadatab-onlysamples-finalFiltered.qza # dadatab minus singletons and nonsense taxons (mito, unassign etc.)
 # IN_FTAB=results/collapstab-onlysamples-finalFiltered-srs.qza # collapsed, minus nonsense taxons and minfreq 20, SRS-normalized
 IN_PHYL=results/sepp/phylogeny.qza
 METADATA=data/metadata_samples_Q2.tsv
@@ -160,3 +160,27 @@ qiime diversity beta-group-significance \
     --m-metadata-column $META_COL_GROUP1\
     --p-method 'permanova' \
     --o-visualization $OUTDIR/wUniFrac-beta-sig.qzv
+
+qiime diversity beta-phylogenetic \
+    --i-table $IN_FTAB \
+    --i-phylogeny $IN_PHYL \
+    --p-metric 'generalized_unifrac' \
+    --o-distance-matrix $OUTDIR/gUniFrac-beta.qza
+qiime diversity beta-correlation \
+    --i-distance-matrix $OUTDIR/gUniFrac-beta.qza \
+    --m-metadata-file $METADATA \
+    --m-metadata-column $META_COL_COR1 \
+    --p-method 'spearman' \
+    --output-dir $OUTDIR/gUniFrac-beta-cor-$META_COL_COR1
+qiime diversity beta-correlation \
+    --i-distance-matrix $OUTDIR/gUniFrac-beta.qza \
+    --m-metadata-file $METADATA \
+    --m-metadata-column $META_COL_COR2 \
+    --p-method 'spearman' \
+    --output-dir $OUTDIR/gUniFrac-beta-cor-$META_COL_COR2
+qiime diversity beta-group-significance \
+    --i-distance-matrix $OUTDIR/gUniFrac-beta.qza \
+    --m-metadata-file $METADATA \
+    --m-metadata-column $META_COL_GROUP1\
+    --p-method 'permanova' \
+    --o-visualization $OUTDIR/gUniFrac-beta-sig.qzv
