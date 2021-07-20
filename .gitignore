@@ -12,3 +12,8 @@ src/R_notebooks/.Rhistory
 *.ods
 *.qzv
 
+# other draft files that didn't contribute to the final results:
+src/R_notebooks/maaslin.Rmd
+deicode.txt
+alpha_div.txt
+MaAsLin2_setup.txt

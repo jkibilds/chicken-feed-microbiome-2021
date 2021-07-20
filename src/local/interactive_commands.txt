@@ -1,4 +1,4 @@
-# all commands are executed from project root directory /media/juris/5e715177-0993-440c-996e-24251812b25a/juris/seq/repos/chicken_feed_study
+# all commands are executed from project root directory $HOME/seq/repos/chicken_feed_study
 
 # load QIIME2 environment:
 conda activate qiime2-2020.11
