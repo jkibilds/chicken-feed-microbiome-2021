@@ -20,3 +20,4 @@ rm results/feature-table.biom # clean up
 qiime metadata tabulate --m-input-file results/taxonomy.qza --o-visualization results/taxonomy.qzv
 # export or save this taxonomy table as TSV from interactive view: feature-taxonomy-tabulated.tsv
 # then find the taxonomies manually, unless there are so many to require a script
+# a script like src/local/add_tax_to_maaslin.sh can be used to automate adding taxonomy to MaAsLin2 output
